@@ -5,6 +5,11 @@
  */
 package pantalla;
 
+import cpu.Direccionamiento;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import utilidades.Validador;
+
 /**
  *
  * @author Marvin
@@ -16,6 +21,18 @@ public class SimuladorFrame extends javax.swing.JFrame {
      */
     public SimuladorFrame() {
         initComponents();
+        initPersonal();
+    }
+    
+    /**
+     * Inicializar algunos componentes personalizados
+     */
+    private void initPersonal(){
+        //Agregar filas a la tabla de caches(LINEAS DE CACHE)
+        DefaultTableModel tCache = (DefaultTableModel) tablaLineasCache.getModel();
+        for(int i=0; i<128; i++){
+            tCache.addRow(new Object[]{i});
+        }
     }
 
     /**
@@ -96,7 +113,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
         regUsarRAM = new javax.swing.JComboBox<>();
         escribirRam = new javax.swing.JButton();
         jLabel26 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        txtEscribirRAM = new javax.swing.JTextField();
 
         jLabel15.setText("jLabel15");
 
@@ -109,17 +126,65 @@ public class SimuladorFrame extends javax.swing.JFrame {
 
         jLabel2.setText("AX");
 
+        txtAX.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtAXKeyTyped(evt);
+            }
+        });
+
         jLabel3.setText("BX");
+
+        txtBX.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtBXKeyTyped(evt);
+            }
+        });
 
         jLabel4.setText("CX");
 
+        txtCX.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtCXKeyTyped(evt);
+            }
+        });
+
         jLabel5.setText("DX");
+
+        txtDX.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtDXKeyTyped(evt);
+            }
+        });
 
         jLabel6.setText("SI");
 
         jLabel7.setText("DI");
 
+        txtSI.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtSIKeyTyped(evt);
+            }
+        });
+
+        txtDI.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtDIKeyTyped(evt);
+            }
+        });
+
         jLabel8.setText("SP");
+
+        txtSP.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtSPKeyTyped(evt);
+            }
+        });
+
+        txtBP.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtBPKeyTyped(evt);
+            }
+        });
 
         jLabel9.setText("BP");
 
@@ -127,11 +192,41 @@ public class SimuladorFrame extends javax.swing.JFrame {
 
         jLabel11.setText("CS");
 
+        txtSS.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtSSKeyTyped(evt);
+            }
+        });
+
+        txtCS.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtCSKeyTyped(evt);
+            }
+        });
+
         jLabel12.setText("DS");
+
+        txtDS.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtDSKeyTyped(evt);
+            }
+        });
+
+        txtES.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtESKeyTyped(evt);
+            }
+        });
 
         jLabel13.setText("ES");
 
         jLabel14.setText("PC");
+
+        PC.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                PCKeyTyped(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelRegistrosCPULayout = new javax.swing.GroupLayout(jPanelRegistrosCPU);
         jPanelRegistrosCPU.setLayout(jPanelRegistrosCPULayout);
@@ -240,14 +335,14 @@ public class SimuladorFrame extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Direccion", "Direccionamiento", "Registro"
+                "Direccion", "Direccionamiento", "Registro", "Val. Registro"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Object.class
+                java.lang.String.class, java.lang.String.class, java.lang.Object.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false
+                false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -261,6 +356,11 @@ public class SimuladorFrame extends javax.swing.JFrame {
         jScrollPane1.setViewportView(tablaPeticiones);
 
         eliminarPeticion.setText("Eliminar");
+        eliminarPeticion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                eliminarPeticionActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelPeticionesCPULayout = new javax.swing.GroupLayout(jPanelPeticionesCPU);
         jPanelPeticionesCPU.setLayout(jPanelPeticionesCPULayout);
@@ -289,9 +389,25 @@ public class SimuladorFrame extends javax.swing.JFrame {
 
         jLabel16.setText("Direccion a acceder:");
 
+        direccionCPU.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                direccionCPUKeyTyped(evt);
+            }
+        });
+
         jLabel17.setText("Método de direccionamiento:");
 
         metDireccionamiento.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Directo", "Indirecto con Registro", "Desplazamiento Relativo", "Desplazamiento Registro Base", "Indexado", "Pila" }));
+        metDireccionamiento.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                metDireccionamientoItemStateChanged(evt);
+            }
+        });
+        metDireccionamiento.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                metDireccionamientoActionPerformed(evt);
+            }
+        });
 
         jLabel18.setText("Registro a usar:");
         jLabel18.setEnabled(false);
@@ -299,16 +415,17 @@ public class SimuladorFrame extends javax.swing.JFrame {
         regUsar.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "AX", "BX", "CX", "DX", "SP", "BP", "SI", "DI", "DS", "ES", "SS", "CS", "PC" }));
         regUsar.setEnabled(false);
 
-        agregarPeticion.setText("Agregar");
+        agregarPeticion.setText("Agregar Peticion");
+        agregarPeticion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                agregarPeticionActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelIngresarCPULayout = new javax.swing.GroupLayout(jPanelIngresarCPU);
         jPanelIngresarCPU.setLayout(jPanelIngresarCPULayout);
         jPanelIngresarCPULayout.setHorizontalGroup(
             jPanelIngresarCPULayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelIngresarCPULayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(agregarPeticion)
-                .addGap(80, 80, 80))
             .addGroup(jPanelIngresarCPULayout.createSequentialGroup()
                 .addGroup(jPanelIngresarCPULayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanelIngresarCPULayout.createSequentialGroup()
@@ -327,6 +444,10 @@ public class SimuladorFrame extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(direccionCPU, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelIngresarCPULayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(agregarPeticion)
+                .addGap(41, 41, 41))
         );
         jPanelIngresarCPULayout.setVerticalGroup(
             jPanelIngresarCPULayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -531,9 +652,20 @@ public class SimuladorFrame extends javax.swing.JFrame {
 
         jLabel23.setText("Direccion a escribir:");
 
+        direccionRAM.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                direccionRAMKeyTyped(evt);
+            }
+        });
+
         jLabel24.setText("Método de direccionamiento:");
 
         metDireccionamientoRAM.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Directo", "Indirecto con Registro", "Desplazamiento Relativo", "Desplazamiento Registro Base", "Indexado", "Pila" }));
+        metDireccionamientoRAM.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                metDireccionamientoRAMActionPerformed(evt);
+            }
+        });
 
         jLabel25.setText("Registro a usar:");
         jLabel25.setEnabled(false);
@@ -541,9 +673,15 @@ public class SimuladorFrame extends javax.swing.JFrame {
         regUsarRAM.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "AX", "BX", "CX", "DX", "SP", "BP", "SI", "DI", "DS", "ES", "SS", "CS", "PC" }));
         regUsarRAM.setEnabled(false);
 
-        escribirRam.setText("Escribir");
+        escribirRam.setText("Escribir en RAM");
 
         jLabel26.setText("Dato:");
+
+        txtEscribirRAM.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtEscribirRAMKeyTyped(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelIngresarCPU1Layout = new javax.swing.GroupLayout(jPanelIngresarCPU1);
         jPanelIngresarCPU1.setLayout(jPanelIngresarCPU1Layout);
@@ -571,7 +709,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(jPanelIngresarCPU1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(regUsarRAM, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                    .addComponent(txtEscribirRAM, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelIngresarCPU1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
@@ -594,10 +732,10 @@ public class SimuladorFrame extends javax.swing.JFrame {
                     .addComponent(regUsarRAM, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel25))
                 .addGap(18, 18, 18)
-                .addGroup(jPanelIngresarCPU1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanelIngresarCPU1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel26)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                    .addComponent(txtEscribirRAM, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
                 .addComponent(escribirRam)
                 .addContainerGap())
         );
@@ -640,6 +778,152 @@ public class SimuladorFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void txtAXKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtAXKeyTyped
+        Validador.validarBytesHexa(evt, Validador.DOS_BYTES, txtAX.getText().length());
+    }//GEN-LAST:event_txtAXKeyTyped
+
+    private void txtBXKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBXKeyTyped
+        Validador.validarBytesHexa(evt, Validador.DOS_BYTES, txtBX.getText().length());
+    }//GEN-LAST:event_txtBXKeyTyped
+
+    private void txtCXKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCXKeyTyped
+        Validador.validarBytesHexa(evt, Validador.DOS_BYTES, txtCX.getText().length());
+    }//GEN-LAST:event_txtCXKeyTyped
+
+    private void txtDXKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDXKeyTyped
+        Validador.validarBytesHexa(evt, Validador.DOS_BYTES, txtDX.getText().length());
+    }//GEN-LAST:event_txtDXKeyTyped
+
+    private void txtSPKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSPKeyTyped
+        Validador.validarBytesHexa(evt, Validador.DOS_BYTES, txtSP.getText().length());
+    }//GEN-LAST:event_txtSPKeyTyped
+
+    private void txtBPKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBPKeyTyped
+        Validador.validarBytesHexa(evt, Validador.DOS_BYTES, txtBP.getText().length());
+    }//GEN-LAST:event_txtBPKeyTyped
+
+    private void txtSIKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSIKeyTyped
+        Validador.validarBytesHexa(evt, Validador.DOS_BYTES, txtSI.getText().length());
+    }//GEN-LAST:event_txtSIKeyTyped
+
+    private void txtDIKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDIKeyTyped
+        Validador.validarBytesHexa(evt, Validador.DOS_BYTES, txtDI.getText().length());
+    }//GEN-LAST:event_txtDIKeyTyped
+
+    private void txtDSKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDSKeyTyped
+        Validador.validarBytesHexa(evt, Validador.DOS_BYTES, txtDS.getText().length());
+    }//GEN-LAST:event_txtDSKeyTyped
+
+    private void txtESKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtESKeyTyped
+        Validador.validarBytesHexa(evt, Validador.DOS_BYTES, txtES.getText().length());
+    }//GEN-LAST:event_txtESKeyTyped
+
+    private void txtSSKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSSKeyTyped
+        Validador.validarBytesHexa(evt, Validador.DOS_BYTES, txtSS.getText().length());
+    }//GEN-LAST:event_txtSSKeyTyped
+
+    private void txtCSKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCSKeyTyped
+        Validador.validarBytesHexa(evt, Validador.DOS_BYTES, txtCS.getText().length());
+    }//GEN-LAST:event_txtCSKeyTyped
+
+    private void PCKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_PCKeyTyped
+        Validador.validarBytesHexa(evt, Validador.DOS_BYTES, PC.getText().length());
+    }//GEN-LAST:event_PCKeyTyped
+
+    private void direccionCPUKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_direccionCPUKeyTyped
+        Validador.validarBytesHexa(evt, Validador.DOS_BYTES, direccionCPU.getText().length());
+    }//GEN-LAST:event_direccionCPUKeyTyped
+
+    private void direccionRAMKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_direccionRAMKeyTyped
+        Validador.validarBytesHexa(evt, Validador.DOS_BYTES, direccionRAM.getText().length());
+    }//GEN-LAST:event_direccionRAMKeyTyped
+
+    private void txtEscribirRAMKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtEscribirRAMKeyTyped
+        Validador.validarBytesHexa(evt, Validador.UN_BYTE, txtEscribirRAM.getText().length());
+    }//GEN-LAST:event_txtEscribirRAMKeyTyped
+
+    private void metDireccionamientoItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_metDireccionamientoItemStateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_metDireccionamientoItemStateChanged
+
+    private void metDireccionamientoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_metDireccionamientoActionPerformed
+        if(metDireccionamiento.getSelectedIndex()==Direccionamiento.INDIRECTO_REGISTRO || metDireccionamiento.getSelectedIndex()==Direccionamiento.DESPLAZA_REGISTRO_BASE){
+            jLabel18.setEnabled(true);
+            regUsar.setEnabled(true);
+        }else{
+            jLabel18.setEnabled(false);
+            regUsar.setEnabled(false);
+        }
+    }//GEN-LAST:event_metDireccionamientoActionPerformed
+
+    private void metDireccionamientoRAMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_metDireccionamientoRAMActionPerformed
+        if(metDireccionamientoRAM.getSelectedIndex()==Direccionamiento.INDIRECTO_REGISTRO || metDireccionamientoRAM.getSelectedIndex()==Direccionamiento.DESPLAZA_REGISTRO_BASE){
+            jLabel25.setEnabled(true);
+            regUsarRAM.setEnabled(true);
+        }else{
+            jLabel25.setEnabled(false);
+            regUsarRAM.setEnabled(false);
+        }
+    }//GEN-LAST:event_metDireccionamientoRAMActionPerformed
+
+    private void agregarPeticionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agregarPeticionActionPerformed
+        String dir = direccionCPU.getText();
+        int elementoSelect = metDireccionamiento.getSelectedIndex();
+        DefaultTableModel tabPeti = (DefaultTableModel)tablaPeticiones.getModel();
+        if(!dir.isEmpty()){
+            switch(elementoSelect){
+                case Direccionamiento.DIRECTO: case Direccionamiento.DESPLAZA_RELATIVO: case Direccionamiento.INDEXADO: case Direccionamiento.PILA:
+                    tabPeti.addRow(new Object[]{dir,metDireccionamiento.getSelectedItem()});
+                break;
+                case Direccionamiento.INDIRECTO_REGISTRO: case Direccionamiento.DESPLAZA_REGISTRO_BASE:
+                    String registroUsar = (String)regUsar.getSelectedItem();
+                    String valorRegistro = null;
+                    if(registroUsar=="AX")
+                        valorRegistro=txtAX.getText();
+                    else if(registroUsar=="BX")
+                        valorRegistro=txtBX.getText();
+                    else if(registroUsar=="CX")
+                        valorRegistro=txtCX.getText();
+                    else if(registroUsar=="DX")
+                        valorRegistro=txtDX.getText();
+                    else if(registroUsar=="SP")
+                        valorRegistro=txtSP.getText();
+                    else if(registroUsar=="BP")
+                        valorRegistro=txtBP.getText();
+                    else if(registroUsar=="SI")
+                        valorRegistro=txtSI.getText();
+                    else if(registroUsar=="DI")
+                        valorRegistro=txtDI.getText();
+                    else if(registroUsar=="DS")
+                        valorRegistro=txtDS.getText();
+                    else if(registroUsar=="ES")
+                        valorRegistro=txtES.getText();
+                    else if(registroUsar=="SS")
+                        valorRegistro=txtSS.getText();
+                    else if(registroUsar=="CS")
+                        valorRegistro=txtCS.getText();
+                    else if(registroUsar=="PC")
+                        valorRegistro=PC.getText();
+                    
+                    tabPeti.addRow(new Object[]{dir,metDireccionamiento.getSelectedItem(),registroUsar, valorRegistro});
+                break;
+            }
+        }else{
+            JOptionPane.showMessageDialog(this, "El campo de direcciones no puede estar basio", "No Nulo", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_agregarPeticionActionPerformed
+
+    private void eliminarPeticionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarPeticionActionPerformed
+        DefaultTableModel tabla = (DefaultTableModel) tablaPeticiones.getModel();
+        int[] filas = tablaPeticiones.getSelectedRows();
+        for(int fila: filas){
+            for(int i=0;i<filas.length;i++){
+                filas[i]--;
+            }
+            tabla.removeRow(fila);
+        }
+    }//GEN-LAST:event_eliminarPeticionActionPerformed
 
     /**
      * @param args the command line arguments
@@ -725,7 +1009,6 @@ public class SimuladorFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JList<String> listDatosEnviados;
     private javax.swing.JList<String> listPasosRealizados;
     private javax.swing.JComboBox<String> metDireccionamiento;
@@ -744,6 +1027,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
     private javax.swing.JTextField txtDS;
     private javax.swing.JTextField txtDX;
     private javax.swing.JTextField txtES;
+    private javax.swing.JTextField txtEscribirRAM;
     private javax.swing.JTextField txtSI;
     private javax.swing.JTextField txtSP;
     private javax.swing.JTextField txtSS;
