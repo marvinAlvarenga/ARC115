@@ -7,7 +7,9 @@ package pantalla;
 
 import cache.Linea;
 import cpu.Direccionamiento;
+import cpu.Peticion;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -22,8 +24,10 @@ public class SimuladorFrame extends javax.swing.JFrame {
     private int capacidadRam = (int)Math.pow(2, 20);
     private int capacidadCache = (int)Math.pow(2, 10);
     private int numLineas = capacidadCache/Linea.TAMANIO_BLOQUE;
+    
     List<String> RAM = new ArrayList<>();
     List<Linea> CACHE = new ArrayList<>();
+    LinkedList<Peticion> colaPeticiones = new LinkedList<>();
     
     /**
      * Creates new form SimuladorFrame
@@ -100,6 +104,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
         jLabel18 = new javax.swing.JLabel();
         regUsar = new javax.swing.JComboBox<>();
         agregarPeticion = new javax.swing.JButton();
+        procesar = new javax.swing.JButton();
         jPanelCache = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -485,6 +490,8 @@ public class SimuladorFrame extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        procesar.setText("Procesar");
+
         javax.swing.GroupLayout jPanelCPULayout = new javax.swing.GroupLayout(jPanelCPU);
         jPanelCPU.setLayout(jPanelCPULayout);
         jPanelCPULayout.setHorizontalGroup(
@@ -492,6 +499,10 @@ public class SimuladorFrame extends javax.swing.JFrame {
             .addComponent(jPanelPeticionesCPU, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanelRegistrosCPU, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanelIngresarCPU, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanelCPULayout.createSequentialGroup()
+                .addGap(134, 134, 134)
+                .addComponent(procesar)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanelCPULayout.setVerticalGroup(
             jPanelCPULayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -501,6 +512,8 @@ public class SimuladorFrame extends javax.swing.JFrame {
                 .addComponent(jPanelPeticionesCPU, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanelIngresarCPU, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(procesar)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -895,6 +908,11 @@ public class SimuladorFrame extends javax.swing.JFrame {
         int elementoSelect = metDireccionamiento.getSelectedIndex();
         DefaultTableModel tabPeti = (DefaultTableModel)tablaPeticiones.getModel();
         if(!dir.isEmpty()){
+            
+            Peticion peti = new Peticion();
+            peti.direccion = dir;
+            peti.metodoDireccion = elementoSelect;
+            
             switch(elementoSelect){
                 case Direccionamiento.DIRECTO: case Direccionamiento.DESPLAZA_RELATIVO: case Direccionamiento.INDEXADO: case Direccionamiento.PILA:
                     tabPeti.addRow(new Object[]{dir,metDireccionamiento.getSelectedItem()});
@@ -929,9 +947,11 @@ public class SimuladorFrame extends javax.swing.JFrame {
                     else if(registroUsar=="PC")
                         valorRegistro=PC.getText();
                     
+                    peti.valorRegistro = valorRegistro;
                     tabPeti.addRow(new Object[]{dir,metDireccionamiento.getSelectedItem(),registroUsar, valorRegistro});
                 break;
             }
+            colaPeticiones.offer(peti);
         }else{
             JOptionPane.showMessageDialog(this, "El campo de direcciones no puede estar basio", "No Nulo", JOptionPane.WARNING_MESSAGE);
         }
@@ -945,6 +965,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
                 filas[i]--;
             }
             tabla.removeRow(fila);
+            colaPeticiones.remove(fila);
         }
     }//GEN-LAST:event_eliminarPeticionActionPerformed
 
@@ -1046,6 +1067,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
     private javax.swing.JList<String> listPasosRealizados;
     private javax.swing.JComboBox<String> metDireccionamiento;
     private javax.swing.JComboBox<String> metDireccionamientoRAM;
+    private javax.swing.JButton procesar;
     private javax.swing.JComboBox<String> regUsar;
     private javax.swing.JComboBox<String> regUsarRAM;
     private javax.swing.JComboBox<String> sustitucion;
