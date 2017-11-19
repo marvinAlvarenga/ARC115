@@ -5,7 +5,10 @@
  */
 package pantalla;
 
+import cache.Linea;
 import cpu.Direccionamiento;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import utilidades.Validador;
@@ -16,24 +19,36 @@ import utilidades.Validador;
  */
 public class SimuladorFrame extends javax.swing.JFrame {
 
+    private int capacidadRam = (int)Math.pow(2, 20);
+    private int capacidadCache = (int)Math.pow(2, 10);
+    private int numLineas = capacidadCache/Linea.TAMANIO_BLOQUE;
+    List<String> RAM = new ArrayList<>();
+    List<Linea> CACHE = new ArrayList<>();
+    
     /**
      * Creates new form SimuladorFrame
      */
     public SimuladorFrame() {
         initComponents();
-        initPersonal();
+        
+        //Crear una RAM
+        for(int i=0;i<capacidadRam;i++)
+            RAM.add("00");
+        System.out.println(RAM.size());
+        
+        DefaultTableModel tCache = (DefaultTableModel) tablaLineasCache.getModel();
+        
+        //Crear la CACHE, inicializarla e inicializar la tabla
+        for(int j=0;j<numLineas;j++){
+            Linea l = new Linea();
+            l.inicializarElementos();
+            CACHE.add(l);
+            
+            tCache.addRow(new Object[]{j,l.linea.get(0),l.linea.get(1),l.linea.get(2),l.linea.get(3),l.linea.get(4),l.linea.get(5),l.linea.get(6),l.linea.get(7)});
+        }
+        System.out.println(CACHE.size());
     }
     
-    /**
-     * Inicializar algunos componentes personalizados
-     */
-    private void initPersonal(){
-        //Agregar filas a la tabla de caches(LINEAS DE CACHE)
-        DefaultTableModel tCache = (DefaultTableModel) tablaLineasCache.getModel();
-        for(int i=0; i<128; i++){
-            tCache.addRow(new Object[]{i});
-        }
-    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -317,14 +332,15 @@ public class SimuladorFrame extends javax.swing.JFrame {
                     .addComponent(jLabel13)
                     .addComponent(txtES, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanelRegistrosCPULayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel10)
-                    .addComponent(txtSS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel11)
-                    .addComponent(txtCS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanelRegistrosCPULayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanelRegistrosCPULayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel14)
-                        .addComponent(PC, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(PC, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanelRegistrosCPULayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel10)
+                        .addComponent(txtSS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel11)
+                        .addComponent(txtCS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -495,10 +511,17 @@ public class SimuladorFrame extends javax.swing.JFrame {
         jLabel1.setText("Función de Correspondencia:");
 
         jLabel19.setText("Algoritmo de Sustitución:");
+        jLabel19.setEnabled(false);
 
         correspondencia.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Directa", "Asosiativa", "Asociativa por Conjunto" }));
+        correspondencia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                correspondenciaActionPerformed(evt);
+            }
+        });
 
         sustitucion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "LRU", "FIFO", "LFU" }));
+        sustitucion.setEnabled(false);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -924,6 +947,16 @@ public class SimuladorFrame extends javax.swing.JFrame {
             tabla.removeRow(fila);
         }
     }//GEN-LAST:event_eliminarPeticionActionPerformed
+
+    private void correspondenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_correspondenciaActionPerformed
+        if(correspondencia.getSelectedIndex() != Linea.CORRESPONDENCIA_DIRECTA){
+            jLabel19.setEnabled(true);
+            sustitucion.setEnabled(true);
+        }else{
+            jLabel19.setEnabled(false);
+            sustitucion.setEnabled(false);
+        }
+    }//GEN-LAST:event_correspondenciaActionPerformed
 
     /**
      * @param args the command line arguments
