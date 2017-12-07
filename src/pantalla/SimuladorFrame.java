@@ -28,7 +28,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
     private int capacidadRam = (int) Math.pow(2, 20);
     private int capacidadCache = (int) Math.pow(2, 10);
     private int numLineas = capacidadCache / Cache.TAMANIO_BLOQUE;
-    private int numConjuntos = numLineas/2;
+    private int numConjuntos = numLineas / 2;
 
     List<String> RAM = new ArrayList<>();
     List<Linea> CACHE = new ArrayList<>();
@@ -120,13 +120,12 @@ public class SimuladorFrame extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         tablaLineasCache = new javax.swing.JTable();
         jPanel3 = new javax.swing.JPanel();
-        jLabel21 = new javax.swing.JLabel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        listDatosEnviados = new javax.swing.JList<>();
         jLabel22 = new javax.swing.JLabel();
         aciertos = new javax.swing.JTextField();
         jScrollPane5 = new javax.swing.JScrollPane();
         tablaPasosRealizados = new javax.swing.JTable();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        tablaResultados = new javax.swing.JTable();
         jPanelRAM = new javax.swing.JPanel();
         jPanelIngresarCPU1 = new javax.swing.JPanel();
         jLabel23 = new javax.swing.JLabel();
@@ -523,7 +522,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
                 .addComponent(jPanelIngresarCPU, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(procesar)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(100, Short.MAX_VALUE))
         );
 
         jPanelCache.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Cache", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 14))); // NOI18N
@@ -588,7 +587,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
                 java.lang.String.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, true, false
+                false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -620,10 +619,6 @@ public class SimuladorFrame extends javax.swing.JFrame {
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("En Ejecucion"));
 
-        jLabel21.setText("Datos a CPU:");
-
-        jScrollPane3.setViewportView(listDatosEnviados);
-
         jLabel22.setText("Numero de Aciertos:");
 
         aciertos.setEditable(false);
@@ -653,6 +648,34 @@ public class SimuladorFrame extends javax.swing.JFrame {
         });
         jScrollPane5.setViewportView(tablaPasosRealizados);
 
+        tablaResultados.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Resultados"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane4.setViewportView(tablaResultados);
+        if (tablaResultados.getColumnModel().getColumnCount() > 0) {
+            tablaResultados.getColumnModel().getColumn(0).setResizable(false);
+        }
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -667,26 +690,17 @@ public class SimuladorFrame extends javax.swing.JFrame {
                         .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(37, 37, 37)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(jLabel21)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(aciertos, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(aciertos, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(20, 20, 20)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel22)
@@ -780,7 +794,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
                                 .addGroup(jPanelIngresarCPU1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(regUsarRAM, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(txtEscribirRAM, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(0, 195, Short.MAX_VALUE))
+                        .addGap(0, 72, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelIngresarCPU1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(escribirRam)))
@@ -816,8 +830,8 @@ public class SimuladorFrame extends javax.swing.JFrame {
             jPanelRAMLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelRAMLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanelIngresarCPU1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanelIngresarCPU1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(133, Short.MAX_VALUE))
         );
         jPanelRAMLayout.setVerticalGroup(
             jPanelRAMLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -948,17 +962,17 @@ public class SimuladorFrame extends javax.swing.JFrame {
             peti.metodoDireccion = elementoSelect;
 
             switch (elementoSelect) {
-                case Direccionamiento.DIRECTO:              
+                case Direccionamiento.DIRECTO:
                 case Direccionamiento.PILA:
                     tabPeti.addRow(new Object[]{dir, metDireccionamiento.getSelectedItem()});
                     break;
-                case Direccionamiento.DESPLAZA_RELATIVO: 
+                case Direccionamiento.DESPLAZA_RELATIVO:
                     String registroU = "PC";
                     String valoR = PC.getText();
-                    if(valoR.isEmpty() || valoR == null){
+                    if (valoR.isEmpty() || valoR == null) {
                         peti.valorRegistro = String.valueOf(0);
                         tabPeti.addRow(new Object[]{dir, metDireccionamiento.getSelectedItem(), registroU, "0"});
-                    }else{
+                    } else {
                         peti.valorRegistro = valoR;
                         tabPeti.addRow(new Object[]{dir, metDireccionamiento.getSelectedItem(), registroU, valoR});
                     }
@@ -995,7 +1009,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
                     } else if (registroUsar == "PC") {
                         valorRegistro = PC.getText();
                     }
-                    if(valorRegistro.isEmpty() || valorRegistro == null){
+                    if (valorRegistro.isEmpty() || valorRegistro == null) {
                         valorRegistro = "0";
                     }
                     peti.valorRegistro = valorRegistro;
@@ -1032,45 +1046,77 @@ public class SimuladorFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_correspondenciaActionPerformed
 
     private void procesarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_procesarActionPerformed
+
+        this.aciertos.setText("");
         
-        DefaultTableModel pasos2 = (DefaultTableModel)tablaPasosRealizados.getModel();
-        
-        for(int i=tablaPasosRealizados.getRowCount()-1;i>=0;i--){
+        DefaultTableModel pasos2 = (DefaultTableModel) tablaPasosRealizados.getModel();
+
+        for (int i = tablaPasosRealizados.getRowCount() - 1; i >= 0; i--) {
             pasos2.removeRow(i);
         }
-        
-        
-        
+
         int tipoCorrespondencia = correspondencia.getSelectedIndex();
         int metodoSustitucion = sustitucion.getSelectedIndex();
         int aciertos = 0;
 
-        DefaultTableModel pasos = (DefaultTableModel)tablaPasosRealizados.getModel();
+        DefaultTableModel pasos = (DefaultTableModel) tablaPasosRealizados.getModel();
+        DefaultTableModel resultados = (DefaultTableModel) tablaResultados.getModel();
+        DefaultTableModel cache = (DefaultTableModel) tablaLineasCache.getModel();
 
         try {
             for (Peticion p : colaPeticiones) {
                 pasos.addRow(new Object[]{"Calculando Dir. Fisica"});
-                
+
                 String dir = Direccionamiento.generarDireccionFisica(p);
-                
-                pasos.addRow(new Object[]{"Dir. Fisica: "+ dir});
+
+                pasos.addRow(new Object[]{"Dir. Fisica: " + dir});
                 pasos.addRow(new Object[]{"Verificando cache"});
-                
-                
+
+                String etiqueta = Cache.generarEtiqueta(dir, tipoCorrespondencia);
+                int numBloque = Cache.generarBloqueMP(dir);
+                int palabra = Cache.generarPalabra(dir);
+                String dato = null;
+
+                if (tipoCorrespondencia == Cache.CORRESPONDENCIA_DIRECTA) {
+                    int numLinea = numBloque % numLineas;
+                    Linea l = CACHE.get(numLinea);
+                    if (l.etiqueta != null && l.etiqueta.equals(etiqueta)) {
+                        aciertos++;
+                        this.aciertos.setText(String.valueOf(aciertos));
+                        pasos.addRow(new Object[]{"Acierto en Cache"});
+                        dato = l.linea.get(palabra);
+                        pasos.addRow(new Object[]{"Devolviendo dato a CPU"});
+                        resultados.addRow(new Object[]{dato});
+                    }else{
+                        pasos.addRow(new Object[]{"Fallo en Cache"});
+                        pasos.addRow(new Object[]{"Actualizando Cache"});
+                        pasos.addRow(new Object[]{"Devolviendo dato a CPU"});
+                        dato = RAM.get(numBloque + palabra);
+                        resultados.addRow(new Object[]{dato});
+                        l.etiqueta = etiqueta;
+                        for(int i=0;i<8;i++){
+                            l.linea.set(i, RAM.get(numBloque+i));
+                            cache.setValueAt(dato, numLinea, i);
+                        }
+                    }
+
+                }
+
                 pasos.addRow(new Object[]{"-------------------------------------------"});
                 Thread.sleep(1);
             }
+            cache.fireTableDataChanged();
             pasos.fireTableDataChanged();
         } catch (InterruptedException ex) {
             Logger.getLogger(SimuladorFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
 
     }//GEN-LAST:event_procesarActionPerformed
 
     /**
-         * @param args the command line arguments
-         */
+     * @param args the command line arguments
+     */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -1124,7 +1170,6 @@ public class SimuladorFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
@@ -1149,9 +1194,8 @@ public class SimuladorFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanelRegistrosCPU;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
-    private javax.swing.JList<String> listDatosEnviados;
     private javax.swing.JComboBox<String> metDireccionamiento;
     private javax.swing.JComboBox<String> metDireccionamientoRAM;
     private javax.swing.JButton procesar;
@@ -1161,6 +1205,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
     private javax.swing.JTable tablaLineasCache;
     private javax.swing.JTable tablaPasosRealizados;
     private javax.swing.JTable tablaPeticiones;
+    private javax.swing.JTable tablaResultados;
     private javax.swing.JTextField txtAX;
     private javax.swing.JTextField txtBP;
     private javax.swing.JTextField txtBX;
