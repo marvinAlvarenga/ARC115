@@ -918,7 +918,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_metDireccionamientoItemStateChanged
 
     private void metDireccionamientoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_metDireccionamientoActionPerformed
-        if (metDireccionamiento.getSelectedIndex() == Direccionamiento.INDIRECTO_REGISTRO || metDireccionamiento.getSelectedIndex() == Direccionamiento.DESPLAZA_REGISTRO_BASE) {
+        if (metDireccionamiento.getSelectedIndex() == Direccionamiento.INDIRECTO_REGISTRO || metDireccionamiento.getSelectedIndex() == Direccionamiento.DESPLAZA_REGISTRO_BASE || metDireccionamiento.getSelectedIndex() == Direccionamiento.INDEXADO) {
             jLabel18.setEnabled(true);
             regUsar.setEnabled(true);
         } else {
@@ -941,21 +941,31 @@ public class SimuladorFrame extends javax.swing.JFrame {
         String dir = direccionCPU.getText();
         int elementoSelect = metDireccionamiento.getSelectedIndex();
         DefaultTableModel tabPeti = (DefaultTableModel) tablaPeticiones.getModel();
-        if (!dir.isEmpty()) {
+        if (!dir.isEmpty() || elementoSelect == Direccionamiento.INDIRECTO_REGISTRO) {
 
             Peticion peti = new Peticion();
             peti.direccion = dir;
             peti.metodoDireccion = elementoSelect;
 
             switch (elementoSelect) {
-                case Direccionamiento.DIRECTO:
-                case Direccionamiento.DESPLAZA_RELATIVO:
-                case Direccionamiento.INDEXADO:
+                case Direccionamiento.DIRECTO:              
                 case Direccionamiento.PILA:
                     tabPeti.addRow(new Object[]{dir, metDireccionamiento.getSelectedItem()});
                     break;
+                case Direccionamiento.DESPLAZA_RELATIVO: 
+                    String registroU = "PC";
+                    String valoR = PC.getText();
+                    if(valoR.isEmpty() || valoR == null){
+                        peti.valorRegistro = String.valueOf(0);
+                        tabPeti.addRow(new Object[]{dir, metDireccionamiento.getSelectedItem(), registroU, "0"});
+                    }else{
+                        peti.valorRegistro = valoR;
+                        tabPeti.addRow(new Object[]{dir, metDireccionamiento.getSelectedItem(), registroU, valoR});
+                    }
+                    break;
                 case Direccionamiento.INDIRECTO_REGISTRO:
                 case Direccionamiento.DESPLAZA_REGISTRO_BASE:
+                case Direccionamiento.INDEXADO:
                     String registroUsar = (String) regUsar.getSelectedItem();
                     String valorRegistro = null;
                     if (registroUsar == "AX") {
@@ -985,7 +995,9 @@ public class SimuladorFrame extends javax.swing.JFrame {
                     } else if (registroUsar == "PC") {
                         valorRegistro = PC.getText();
                     }
-
+                    if(valorRegistro.isEmpty() || valorRegistro == null){
+                        valorRegistro = "0";
+                    }
                     peti.valorRegistro = valorRegistro;
                     tabPeti.addRow(new Object[]{dir, metDireccionamiento.getSelectedItem(), registroUsar, valorRegistro});
                     break;
@@ -1020,7 +1032,15 @@ public class SimuladorFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_correspondenciaActionPerformed
 
     private void procesarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_procesarActionPerformed
-
+        
+        DefaultTableModel pasos2 = (DefaultTableModel)tablaPasosRealizados.getModel();
+        
+        for(int i=tablaPasosRealizados.getRowCount()-1;i>=0;i--){
+            pasos2.removeRow(i);
+        }
+        
+        
+        
         int tipoCorrespondencia = correspondencia.getSelectedIndex();
         int metodoSustitucion = sustitucion.getSelectedIndex();
         int aciertos = 0;
