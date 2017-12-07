@@ -61,8 +61,11 @@ public class Cache {
         int palabra = 0;
         int decimal = Integer.parseInt(direccion, 16);
         String binario = Integer.toBinaryString(decimal);
-        int longi = binario.length();
-        String palabraString = binario.substring(longi-3, longi);
+        int relleno = 20 - binario.length();
+        for(int i=0;i<relleno;i++){
+            binario = "0" + binario;
+        }
+        String palabraString = binario.substring(17, 20);
         palabra = Integer.parseInt(palabraString, 2);
         return palabra;
     }

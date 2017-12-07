@@ -758,6 +758,11 @@ public class SimuladorFrame extends javax.swing.JFrame {
         regUsarRAM.setEnabled(false);
 
         escribirRam.setText("Escribir en RAM");
+        escribirRam.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                escribirRamActionPerformed(evt);
+            }
+        });
 
         jLabel26.setText("Dato:");
 
@@ -942,7 +947,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_metDireccionamientoActionPerformed
 
     private void metDireccionamientoRAMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_metDireccionamientoRAMActionPerformed
-        if (metDireccionamientoRAM.getSelectedIndex() == Direccionamiento.INDIRECTO_REGISTRO || metDireccionamientoRAM.getSelectedIndex() == Direccionamiento.DESPLAZA_REGISTRO_BASE) {
+        if (metDireccionamientoRAM.getSelectedIndex() == Direccionamiento.INDIRECTO_REGISTRO || metDireccionamientoRAM.getSelectedIndex() == Direccionamiento.DESPLAZA_REGISTRO_BASE || metDireccionamiento.getSelectedIndex() == Direccionamiento.INDEXADO) {
             jLabel25.setEnabled(true);
             regUsarRAM.setEnabled(true);
         } else {
@@ -1048,11 +1053,16 @@ public class SimuladorFrame extends javax.swing.JFrame {
     private void procesarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_procesarActionPerformed
 
         this.aciertos.setText("");
-        
+
         DefaultTableModel pasos2 = (DefaultTableModel) tablaPasosRealizados.getModel();
+        DefaultTableModel result2 = (DefaultTableModel) tablaResultados.getModel();
 
         for (int i = tablaPasosRealizados.getRowCount() - 1; i >= 0; i--) {
             pasos2.removeRow(i);
+        }
+        
+        for (int i = tablaResultados.getRowCount() - 1; i >= 0; i--) {
+            result2.removeRow(i);
         }
 
         int tipoCorrespondencia = correspondencia.getSelectedIndex();
@@ -1083,20 +1093,20 @@ public class SimuladorFrame extends javax.swing.JFrame {
                     if (l.etiqueta != null && l.etiqueta.equals(etiqueta)) {
                         aciertos++;
                         this.aciertos.setText(String.valueOf(aciertos));
-                        pasos.addRow(new Object[]{"Acierto en Cache"});
+                        pasos.addRow(new Object[]{"Acierto en Cache. Linea: " + numLinea});
                         dato = l.linea.get(palabra);
                         pasos.addRow(new Object[]{"Devolviendo dato a CPU"});
                         resultados.addRow(new Object[]{dato});
-                    }else{
+                    } else {
                         pasos.addRow(new Object[]{"Fallo en Cache"});
-                        pasos.addRow(new Object[]{"Actualizando Cache"});
+                        pasos.addRow(new Object[]{"Actualizando Cache. Linea: " + numLinea});
                         pasos.addRow(new Object[]{"Devolviendo dato a CPU"});
                         dato = RAM.get(numBloque + palabra);
                         resultados.addRow(new Object[]{dato});
                         l.etiqueta = etiqueta;
-                        for(int i=0;i<8;i++){
-                            l.linea.set(i, RAM.get(numBloque+i));
-                            cache.setValueAt(dato, numLinea, i);
+                        for (int i = 0; i < 8; i++) {
+                            l.linea.set(i, RAM.get(numBloque + i));
+                            cache.setValueAt(dato, numLinea, i + 1);
                         }
                     }
 
@@ -1113,6 +1123,100 @@ public class SimuladorFrame extends javax.swing.JFrame {
 
 
     }//GEN-LAST:event_procesarActionPerformed
+
+    private void escribirRamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_escribirRamActionPerformed
+
+        String dir = direccionRAM.getText();
+        int elementoSelect = metDireccionamientoRAM.getSelectedIndex();
+        if (!dir.isEmpty() || elementoSelect == Direccionamiento.INDIRECTO_REGISTRO) {
+
+            Peticion peti = new Peticion();
+            peti.direccion = dir;
+            peti.metodoDireccion = elementoSelect;
+
+            switch (elementoSelect) {
+                case Direccionamiento.DIRECTO:
+                case Direccionamiento.PILA:
+                    
+                    break;
+                case Direccionamiento.DESPLAZA_RELATIVO:
+                    String registroU = "PC";
+                    String valoR = PC.getText();
+                    if (valoR.isEmpty() || valoR == null) {
+                        peti.valorRegistro = String.valueOf(0);
+                        
+                    } else {
+                        peti.valorRegistro = valoR;
+                        
+                    }
+                    break;
+                case Direccionamiento.INDIRECTO_REGISTRO:
+                case Direccionamiento.DESPLAZA_REGISTRO_BASE:
+                case Direccionamiento.INDEXADO:
+                    String registroUsar = (String) regUsarRAM.getSelectedItem();
+                    String valorRegistro = null;
+                    if (registroUsar == "AX") {
+                        valorRegistro = txtAX.getText();
+                    } else if (registroUsar == "BX") {
+                        valorRegistro = txtBX.getText();
+                    } else if (registroUsar == "CX") {
+                        valorRegistro = txtCX.getText();
+                    } else if (registroUsar == "DX") {
+                        valorRegistro = txtDX.getText();
+                    } else if (registroUsar == "SP") {
+                        valorRegistro = txtSP.getText();
+                    } else if (registroUsar == "BP") {
+                        valorRegistro = txtBP.getText();
+                    } else if (registroUsar == "SI") {
+                        valorRegistro = txtSI.getText();
+                    } else if (registroUsar == "DI") {
+                        valorRegistro = txtDI.getText();
+                    } else if (registroUsar == "DS") {
+                        valorRegistro = txtDS.getText();
+                    } else if (registroUsar == "ES") {
+                        valorRegistro = txtES.getText();
+                    } else if (registroUsar == "SS") {
+                        valorRegistro = txtSS.getText();
+                    } else if (registroUsar == "CS") {
+                        valorRegistro = txtCS.getText();
+                    } else if (registroUsar == "PC") {
+                        valorRegistro = PC.getText();
+                    }
+                    if (valorRegistro.isEmpty() || valorRegistro == null) {
+                        valorRegistro = "0";
+                    }
+                   
+                    break;
+            }
+            
+            DefaultTableModel modelo = (DefaultTableModel) tablaLineasCache.getModel();
+            
+            String datoEscribir = txtEscribirRAM.getText();
+            if(!datoEscribir.isEmpty()){
+                String direccion = Direccionamiento.generarDireccionFisica(peti);
+                int bloque = Cache.generarBloqueMP(direccion);
+                int palabra = Cache.generarPalabra(direccion);
+                int linea = bloque % numLineas;
+                String eti = Cache.generarEtiqueta(direccion, correspondencia.getSelectedIndex());
+                RAM.set(bloque + palabra, datoEscribir);
+                Linea l = CACHE.get(linea);
+                l.etiqueta = eti;
+                for(int i=0;i<8;i++){
+                    l.linea.set(i, RAM.get(bloque + i));
+                    modelo.setValueAt(RAM.get(bloque + i), linea, i+1);
+                }
+                JOptionPane.showMessageDialog(this, "Linea Cache Actualizada: " + linea);
+            }else{
+                JOptionPane.showMessageDialog(this, "El campo de datos no puede estar vacio");
+            }
+            
+            modelo.fireTableDataChanged();
+
+        } else {
+            JOptionPane.showMessageDialog(this, "El campo de direcciones no puede estar basio", "No Nulo", JOptionPane.WARNING_MESSAGE);
+        }
+        
+    }//GEN-LAST:event_escribirRamActionPerformed
 
     /**
      * @param args the command line arguments
