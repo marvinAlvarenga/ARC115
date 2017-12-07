@@ -5,12 +5,16 @@
  */
 package pantalla;
 
+import cache.Cache;
 import cache.Linea;
 import cpu.Direccionamiento;
 import cpu.Peticion;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import utilidades.Validador;
@@ -21,38 +25,39 @@ import utilidades.Validador;
  */
 public class SimuladorFrame extends javax.swing.JFrame {
 
-    private int capacidadRam = (int)Math.pow(2, 20);
-    private int capacidadCache = (int)Math.pow(2, 10);
-    private int numLineas = capacidadCache/Linea.TAMANIO_BLOQUE;
-    
+    private int capacidadRam = (int) Math.pow(2, 20);
+    private int capacidadCache = (int) Math.pow(2, 10);
+    private int numLineas = capacidadCache / Cache.TAMANIO_BLOQUE;
+    private int numConjuntos = numLineas/2;
+
     List<String> RAM = new ArrayList<>();
     List<Linea> CACHE = new ArrayList<>();
     LinkedList<Peticion> colaPeticiones = new LinkedList<>();
-    
+
     /**
      * Creates new form SimuladorFrame
      */
     public SimuladorFrame() {
         initComponents();
-        
+
         //Crear una RAM
-        for(int i=0;i<capacidadRam;i++)
+        for (int i = 0; i < capacidadRam; i++) {
             RAM.add("00");
+        }
         System.out.println(RAM.size());
-        
+
         DefaultTableModel tCache = (DefaultTableModel) tablaLineasCache.getModel();
-        
+
         //Crear la CACHE, inicializarla e inicializar la tabla
-        for(int j=0;j<numLineas;j++){
+        for (int j = 0; j < numLineas; j++) {
             Linea l = new Linea();
             l.inicializarElementos();
             CACHE.add(l);
-            
-            tCache.addRow(new Object[]{j,l.linea.get(0),l.linea.get(1),l.linea.get(2),l.linea.get(3),l.linea.get(4),l.linea.get(5),l.linea.get(6),l.linea.get(7)});
+
+            tCache.addRow(new Object[]{j, l.linea.get(0), l.linea.get(1), l.linea.get(2), l.linea.get(3), l.linea.get(4), l.linea.get(5), l.linea.get(6), l.linea.get(7)});
         }
         System.out.println(CACHE.size());
     }
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -115,14 +120,13 @@ public class SimuladorFrame extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         tablaLineasCache = new javax.swing.JTable();
         jPanel3 = new javax.swing.JPanel();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        listPasosRealizados = new javax.swing.JList<>();
-        jLabel20 = new javax.swing.JLabel();
         jLabel21 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         listDatosEnviados = new javax.swing.JList<>();
         jLabel22 = new javax.swing.JLabel();
         aciertos = new javax.swing.JTextField();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        tablaPasosRealizados = new javax.swing.JTable();
         jPanelRAM = new javax.swing.JPanel();
         jPanelIngresarCPU1 = new javax.swing.JPanel();
         jLabel23 = new javax.swing.JLabel();
@@ -491,6 +495,11 @@ public class SimuladorFrame extends javax.swing.JFrame {
         );
 
         procesar.setText("Procesar");
+        procesar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                procesarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelCPULayout = new javax.swing.GroupLayout(jPanelCPU);
         jPanelCPU.setLayout(jPanelCPULayout);
@@ -611,10 +620,6 @@ public class SimuladorFrame extends javax.swing.JFrame {
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("En Ejecucion"));
 
-        jScrollPane4.setViewportView(listPasosRealizados);
-
-        jLabel20.setText("Pasos seguidos:");
-
         jLabel21.setText("Datos a CPU:");
 
         jScrollPane3.setViewportView(listDatosEnviados);
@@ -623,18 +628,44 @@ public class SimuladorFrame extends javax.swing.JFrame {
 
         aciertos.setEditable(false);
 
+        tablaPasosRealizados.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Pasos Realizados"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane5.setViewportView(tablaPasosRealizados);
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel22)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel20)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap()
+                        .addComponent(jLabel22))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(29, 29, 29)
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(37, 37, 37)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(10, 10, 10)
@@ -647,13 +678,16 @@ public class SimuladorFrame extends javax.swing.JFrame {
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(20, 20, 20)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel22)
                     .addComponent(aciertos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -746,7 +780,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
                                 .addGroup(jPanelIngresarCPU1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(regUsarRAM, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(txtEscribirRAM, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(0, 195, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelIngresarCPU1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(escribirRam)))
@@ -884,20 +918,20 @@ public class SimuladorFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_metDireccionamientoItemStateChanged
 
     private void metDireccionamientoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_metDireccionamientoActionPerformed
-        if(metDireccionamiento.getSelectedIndex()==Direccionamiento.INDIRECTO_REGISTRO || metDireccionamiento.getSelectedIndex()==Direccionamiento.DESPLAZA_REGISTRO_BASE){
+        if (metDireccionamiento.getSelectedIndex() == Direccionamiento.INDIRECTO_REGISTRO || metDireccionamiento.getSelectedIndex() == Direccionamiento.DESPLAZA_REGISTRO_BASE) {
             jLabel18.setEnabled(true);
             regUsar.setEnabled(true);
-        }else{
+        } else {
             jLabel18.setEnabled(false);
             regUsar.setEnabled(false);
         }
     }//GEN-LAST:event_metDireccionamientoActionPerformed
 
     private void metDireccionamientoRAMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_metDireccionamientoRAMActionPerformed
-        if(metDireccionamientoRAM.getSelectedIndex()==Direccionamiento.INDIRECTO_REGISTRO || metDireccionamientoRAM.getSelectedIndex()==Direccionamiento.DESPLAZA_REGISTRO_BASE){
+        if (metDireccionamientoRAM.getSelectedIndex() == Direccionamiento.INDIRECTO_REGISTRO || metDireccionamientoRAM.getSelectedIndex() == Direccionamiento.DESPLAZA_REGISTRO_BASE) {
             jLabel25.setEnabled(true);
             regUsarRAM.setEnabled(true);
-        }else{
+        } else {
             jLabel25.setEnabled(false);
             regUsarRAM.setEnabled(false);
         }
@@ -906,53 +940,58 @@ public class SimuladorFrame extends javax.swing.JFrame {
     private void agregarPeticionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agregarPeticionActionPerformed
         String dir = direccionCPU.getText();
         int elementoSelect = metDireccionamiento.getSelectedIndex();
-        DefaultTableModel tabPeti = (DefaultTableModel)tablaPeticiones.getModel();
-        if(!dir.isEmpty()){
-            
+        DefaultTableModel tabPeti = (DefaultTableModel) tablaPeticiones.getModel();
+        if (!dir.isEmpty()) {
+
             Peticion peti = new Peticion();
             peti.direccion = dir;
             peti.metodoDireccion = elementoSelect;
-            
-            switch(elementoSelect){
-                case Direccionamiento.DIRECTO: case Direccionamiento.DESPLAZA_RELATIVO: case Direccionamiento.INDEXADO: case Direccionamiento.PILA:
-                    tabPeti.addRow(new Object[]{dir,metDireccionamiento.getSelectedItem()});
-                break;
-                case Direccionamiento.INDIRECTO_REGISTRO: case Direccionamiento.DESPLAZA_REGISTRO_BASE:
-                    String registroUsar = (String)regUsar.getSelectedItem();
+
+            switch (elementoSelect) {
+                case Direccionamiento.DIRECTO:
+                case Direccionamiento.DESPLAZA_RELATIVO:
+                case Direccionamiento.INDEXADO:
+                case Direccionamiento.PILA:
+                    tabPeti.addRow(new Object[]{dir, metDireccionamiento.getSelectedItem()});
+                    break;
+                case Direccionamiento.INDIRECTO_REGISTRO:
+                case Direccionamiento.DESPLAZA_REGISTRO_BASE:
+                    String registroUsar = (String) regUsar.getSelectedItem();
                     String valorRegistro = null;
-                    if(registroUsar=="AX")
-                        valorRegistro=txtAX.getText();
-                    else if(registroUsar=="BX")
-                        valorRegistro=txtBX.getText();
-                    else if(registroUsar=="CX")
-                        valorRegistro=txtCX.getText();
-                    else if(registroUsar=="DX")
-                        valorRegistro=txtDX.getText();
-                    else if(registroUsar=="SP")
-                        valorRegistro=txtSP.getText();
-                    else if(registroUsar=="BP")
-                        valorRegistro=txtBP.getText();
-                    else if(registroUsar=="SI")
-                        valorRegistro=txtSI.getText();
-                    else if(registroUsar=="DI")
-                        valorRegistro=txtDI.getText();
-                    else if(registroUsar=="DS")
-                        valorRegistro=txtDS.getText();
-                    else if(registroUsar=="ES")
-                        valorRegistro=txtES.getText();
-                    else if(registroUsar=="SS")
-                        valorRegistro=txtSS.getText();
-                    else if(registroUsar=="CS")
-                        valorRegistro=txtCS.getText();
-                    else if(registroUsar=="PC")
-                        valorRegistro=PC.getText();
-                    
+                    if (registroUsar == "AX") {
+                        valorRegistro = txtAX.getText();
+                    } else if (registroUsar == "BX") {
+                        valorRegistro = txtBX.getText();
+                    } else if (registroUsar == "CX") {
+                        valorRegistro = txtCX.getText();
+                    } else if (registroUsar == "DX") {
+                        valorRegistro = txtDX.getText();
+                    } else if (registroUsar == "SP") {
+                        valorRegistro = txtSP.getText();
+                    } else if (registroUsar == "BP") {
+                        valorRegistro = txtBP.getText();
+                    } else if (registroUsar == "SI") {
+                        valorRegistro = txtSI.getText();
+                    } else if (registroUsar == "DI") {
+                        valorRegistro = txtDI.getText();
+                    } else if (registroUsar == "DS") {
+                        valorRegistro = txtDS.getText();
+                    } else if (registroUsar == "ES") {
+                        valorRegistro = txtES.getText();
+                    } else if (registroUsar == "SS") {
+                        valorRegistro = txtSS.getText();
+                    } else if (registroUsar == "CS") {
+                        valorRegistro = txtCS.getText();
+                    } else if (registroUsar == "PC") {
+                        valorRegistro = PC.getText();
+                    }
+
                     peti.valorRegistro = valorRegistro;
-                    tabPeti.addRow(new Object[]{dir,metDireccionamiento.getSelectedItem(),registroUsar, valorRegistro});
-                break;
+                    tabPeti.addRow(new Object[]{dir, metDireccionamiento.getSelectedItem(), registroUsar, valorRegistro});
+                    break;
             }
             colaPeticiones.offer(peti);
-        }else{
+        } else {
             JOptionPane.showMessageDialog(this, "El campo de direcciones no puede estar basio", "No Nulo", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_agregarPeticionActionPerformed
@@ -960,28 +999,58 @@ public class SimuladorFrame extends javax.swing.JFrame {
     private void eliminarPeticionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarPeticionActionPerformed
         DefaultTableModel tabla = (DefaultTableModel) tablaPeticiones.getModel();
         int[] filas = tablaPeticiones.getSelectedRows();
-        for(int fila: filas){
-            for(int i=0;i<filas.length;i++){
+        for (int fila : filas) {
+            for (int i = 0; i < filas.length; i++) {
                 filas[i]--;
             }
             tabla.removeRow(fila);
             colaPeticiones.remove(fila);
         }
+        System.out.println(colaPeticiones.size());
     }//GEN-LAST:event_eliminarPeticionActionPerformed
 
     private void correspondenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_correspondenciaActionPerformed
-        if(correspondencia.getSelectedIndex() != Linea.CORRESPONDENCIA_DIRECTA){
+        if (correspondencia.getSelectedIndex() != Cache.CORRESPONDENCIA_DIRECTA) {
             jLabel19.setEnabled(true);
             sustitucion.setEnabled(true);
-        }else{
+        } else {
             jLabel19.setEnabled(false);
             sustitucion.setEnabled(false);
         }
     }//GEN-LAST:event_correspondenciaActionPerformed
 
+    private void procesarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_procesarActionPerformed
+
+        int tipoCorrespondencia = correspondencia.getSelectedIndex();
+        int metodoSustitucion = sustitucion.getSelectedIndex();
+        int aciertos = 0;
+
+        DefaultTableModel pasos = (DefaultTableModel)tablaPasosRealizados.getModel();
+
+        try {
+            for (Peticion p : colaPeticiones) {
+                pasos.addRow(new Object[]{"Calculando Dir. Fisica"});
+                
+                String dir = Direccionamiento.generarDireccionFisica(p);
+                
+                pasos.addRow(new Object[]{"Dir. Fisica: "+ dir});
+                pasos.addRow(new Object[]{"Verificando cache"});
+                
+                
+                pasos.addRow(new Object[]{"-------------------------------------------"});
+                Thread.sleep(1);
+            }
+            pasos.fireTableDataChanged();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(SimuladorFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+
+    }//GEN-LAST:event_procesarActionPerformed
+
     /**
-     * @param args the command line arguments
-     */
+         * @param args the command line arguments
+         */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -1035,7 +1104,6 @@ public class SimuladorFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
@@ -1062,9 +1130,8 @@ public class SimuladorFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JList<String> listDatosEnviados;
-    private javax.swing.JList<String> listPasosRealizados;
     private javax.swing.JComboBox<String> metDireccionamiento;
     private javax.swing.JComboBox<String> metDireccionamientoRAM;
     private javax.swing.JButton procesar;
@@ -1072,6 +1139,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> regUsarRAM;
     private javax.swing.JComboBox<String> sustitucion;
     private javax.swing.JTable tablaLineasCache;
+    private javax.swing.JTable tablaPasosRealizados;
     private javax.swing.JTable tablaPeticiones;
     private javax.swing.JTextField txtAX;
     private javax.swing.JTextField txtBP;

@@ -13,4 +13,14 @@ public class Direccionamiento {
     public static final int INDEXADO = 4;
     public static final int PILA = 5;
     
+    
+    public static String generarDireccionFisica(Peticion p){
+        String direccion = null;
+        
+        if(p.metodoDireccion == DIRECTO){
+            direccion = p.direccion;
+        }
+        
+        return direccion;
+    }
 }
