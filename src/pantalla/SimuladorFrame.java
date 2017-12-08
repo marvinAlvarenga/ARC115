@@ -1118,7 +1118,8 @@ public class SimuladorFrame extends javax.swing.JFrame {
                     if (lineaI.etiqueta != null && lineaI.etiqueta.equals(etiqueta)) { //Comprobando la primera via del conjunto
                         aciertos++;
                         this.aciertos.setText(String.valueOf(aciertos));
-                        pasos.addRow(new Object[]{"Acierto en Cache. Linea: " + lineaInicialDeConjunto});
+                        pasos.addRow(new Object[]{"Acierto en Cache. Conjunto: " + numConjunto});
+                        pasos.addRow(new Object[]{"Accediendo a linea: " + lineaInicialDeConjunto});
                         dato = lineaI.linea.get(palabra);
                         pasos.addRow(new Object[]{"Devolviendo dato a CPU. Palabra: " + palabra});
                         //resultados.addRow(new Object[]{dato});
@@ -1129,7 +1130,8 @@ public class SimuladorFrame extends javax.swing.JFrame {
                     } else if (lineaII.etiqueta != null && lineaII.etiqueta.equals(etiqueta)) { //Comprobando la segunda via del conjunto
                         aciertos++;
                         this.aciertos.setText(String.valueOf(aciertos));
-                        pasos.addRow(new Object[]{"Acierto en Cache. Linea: " + lineaInicialDeConjunto + 1});
+                        pasos.addRow(new Object[]{"Acierto en Cache. Conjunto: " + numConjunto});
+                        pasos.addRow(new Object[]{"Accediendo a linea: " + lineaInicialDeConjunto + 1});
                         dato = lineaII.linea.get(palabra);
                         pasos.addRow(new Object[]{"Devolviendo dato a CPU. Palabra: " + palabra});
                         //resultados.addRow(new Object[]{dato});
@@ -1306,7 +1308,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
                     int lineaInicialDeConjunto = conjunto * 2;
                     Linea lineaI = CACHE.get(lineaInicialDeConjunto);
                     Linea lineaII = CACHE.get(lineaInicialDeConjunto + 1);
-                    RAM.set(conjunto * Cache.TAMANIO_BLOQUE + palabra, datoEscribir);
+                    RAM.set(bloque * Cache.TAMANIO_BLOQUE + palabra, datoEscribir);
                     boolean ausenteCache = true;
 
                     //Solo actualizar si el dato ya esta en cache
