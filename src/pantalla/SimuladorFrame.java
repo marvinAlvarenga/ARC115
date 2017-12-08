@@ -684,14 +684,14 @@ public class SimuladorFrame extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jLabel22))
+                        .addComponent(jLabel22)
+                        .addGap(37, 37, 37)
+                        .addComponent(aciertos, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(29, 29, 29)
-                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(37, 37, 37)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(aciertos, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 251, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(38, 38, 38)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -1057,11 +1057,11 @@ public class SimuladorFrame extends javax.swing.JFrame {
         DefaultTableModel pasos2 = (DefaultTableModel) tablaPasosRealizados.getModel();
         DefaultTableModel result2 = (DefaultTableModel) tablaResultados.getModel();
 
-        for (int i = tablaPasosRealizados.getRowCount() - 1; i >= 0; i--) {
+        for (int i = tablaPasosRealizados.getRowCount() - 1; i >= 0; i--) { //Limpiar tabla de Pasos Realizados
             pasos2.removeRow(i);
         }
-        
-        for (int i = tablaResultados.getRowCount() - 1; i >= 0; i--) {
+
+        for (int i = tablaResultados.getRowCount() - 1; i >= 0; i--) { //Limpiar tabla de Datos devueltos al CPU
             result2.removeRow(i);
         }
 
@@ -1095,18 +1095,90 @@ public class SimuladorFrame extends javax.swing.JFrame {
                         this.aciertos.setText(String.valueOf(aciertos));
                         pasos.addRow(new Object[]{"Acierto en Cache. Linea: " + numLinea});
                         dato = l.linea.get(palabra);
-                        pasos.addRow(new Object[]{"Devolviendo dato a CPU"});
+                        pasos.addRow(new Object[]{"Devolviendo dato a CPU. Palabra: " + palabra});
                         resultados.addRow(new Object[]{dato});
-                    } else {
+                    } else { //Fallo de cache. Traer bloque de RAM
                         pasos.addRow(new Object[]{"Fallo en Cache"});
                         pasos.addRow(new Object[]{"Actualizando Cache. Linea: " + numLinea});
-                        pasos.addRow(new Object[]{"Devolviendo dato a CPU"});
-                        dato = RAM.get(numBloque + palabra);
+                        pasos.addRow(new Object[]{"Devolviendo dato a CPU. Palabra: " + palabra});
+                        //dato = RAM.get(numBloque * Cache.TAMANIO_BLOQUE + palabra);
                         resultados.addRow(new Object[]{dato});
                         l.etiqueta = etiqueta;
-                        for (int i = 0; i < 8; i++) {
-                            l.linea.set(i, RAM.get(numBloque + i));
-                            cache.setValueAt(dato, numLinea, i + 1);
+                        for (int i = 0; i < Cache.TAMANIO_BLOQUE; i++) {
+                            l.linea.set(i, RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i));
+                            cache.setValueAt(RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i), numLinea, i + 1);
+                        }
+                    }
+
+                } else if (tipoCorrespondencia == Cache.CORRESPONDENCIA_POR_CONJUNTO) {
+                    int numConjunto = numBloque % numConjuntos;
+                    int lineaInicialDeConjunto = numConjunto * 2; //Calcular la linea inicial del conjunto de dos vias
+                    Linea lineaI = CACHE.get(lineaInicialDeConjunto); //Consultar la primera linea del conjunto
+                    Linea lineaII = CACHE.get(lineaInicialDeConjunto + 1); //Consultar la segunda linea del conjunto
+                    if (lineaI.etiqueta != null && lineaI.etiqueta.equals(etiqueta)) { //Comprobando la primera via del conjunto
+                        aciertos++;
+                        this.aciertos.setText(String.valueOf(aciertos));
+                        pasos.addRow(new Object[]{"Acierto en Cache. Linea: " + lineaInicialDeConjunto});
+                        dato = lineaI.linea.get(palabra);
+                        pasos.addRow(new Object[]{"Devolviendo dato a CPU. Palabra: " + palabra});
+                        resultados.addRow(new Object[]{dato});
+                        lineaI.usado = 1; //Para LRU
+                        lineaII.usado = 0; //Para LRU
+                        lineaI.ordenLLegada++; //Para FIFO
+                        lineaII.ordenLLegada++; //Para FIFO
+                    } else if (lineaII.etiqueta != null && lineaII.etiqueta.equals(etiqueta)) { //Comprobando la segunda via del conjunto
+                        aciertos++;
+                        this.aciertos.setText(String.valueOf(aciertos));
+                        pasos.addRow(new Object[]{"Acierto en Cache. Linea: " + lineaInicialDeConjunto + 1});
+                        dato = lineaII.linea.get(palabra);
+                        pasos.addRow(new Object[]{"Devolviendo dato a CPU. Palabra: " + palabra});
+                        resultados.addRow(new Object[]{dato});
+                        lineaII.usado = 1;
+                        lineaI.usado = 0;
+                        lineaII.ordenLLegada++;
+                        lineaI.ordenLLegada++;
+                    } else //Fallo de Cache. Recuperar desde MP
+                    {
+                        if (metodoSustitucion == Cache.LRU) {
+                            if (lineaI.usado + lineaII.usado == 0 || lineaI.usado == 0) { //El usado menos recientemente es la primera VIA
+                                for (int i = 0; i < Cache.TAMANIO_BLOQUE; i++) {
+                                    lineaI.linea.set(i, RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i));
+                                    cache.setValueAt(RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i), lineaInicialDeConjunto, i + 1);
+                                }
+                                lineaI.usado = 1;
+                                lineaII.usado = 0;
+                                lineaI.ordenLLegada = 0;
+                                lineaII.ordenLLegada++;
+                            } else { //EL usado menos recientemente es la Segunda Via.
+                                for (int i = 0; i < Cache.TAMANIO_BLOQUE; i++) {
+                                    lineaII.linea.set(i, RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i));
+                                    cache.setValueAt(RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i), lineaInicialDeConjunto + 1, i + 1);
+                                }
+                                lineaII.usado = 1;
+                                lineaI.usado = 0;
+                                lineaII.ordenLLegada = 0;
+                                lineaI.ordenLLegada++;
+                            }
+                        } else if (metodoSustitucion == Cache.FIFO) {
+                            if (lineaI.ordenLLegada + lineaII.ordenLLegada == 0 || lineaI.ordenLLegada > lineaII.ordenLLegada) { //Verificar si la Primera Via es la que tiene más tiempo de estar
+                                for (int i = 0; i < Cache.TAMANIO_BLOQUE; i++) {
+                                    lineaI.linea.set(i, RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i));
+                                    cache.setValueAt(RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i), lineaInicialDeConjunto, i + 1);
+                                }
+                                lineaI.usado = 1;
+                                lineaII.usado = 0;
+                                lineaI.ordenLLegada = 0;
+                                lineaII.ordenLLegada++;
+                            } else { //La segunda VIA es la que Entro primero
+                                for (int i = 0; i < Cache.TAMANIO_BLOQUE; i++) {
+                                    lineaII.linea.set(i, RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i));
+                                    cache.setValueAt(RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i), lineaInicialDeConjunto + 1, i + 1);
+                                }
+                                lineaII.usado = 1;
+                                lineaI.usado = 0;
+                                lineaII.ordenLLegada = 0;
+                                lineaI.ordenLLegada++;
+                            }
                         }
                     }
 
@@ -1137,17 +1209,17 @@ public class SimuladorFrame extends javax.swing.JFrame {
             switch (elementoSelect) {
                 case Direccionamiento.DIRECTO:
                 case Direccionamiento.PILA:
-                    
+
                     break;
                 case Direccionamiento.DESPLAZA_RELATIVO:
                     String registroU = "PC";
                     String valoR = PC.getText();
                     if (valoR.isEmpty() || valoR == null) {
                         peti.valorRegistro = String.valueOf(0);
-                        
+
                     } else {
                         peti.valorRegistro = valoR;
-                        
+
                     }
                     break;
                 case Direccionamiento.INDIRECTO_REGISTRO:
@@ -1185,37 +1257,37 @@ public class SimuladorFrame extends javax.swing.JFrame {
                     if (valorRegistro.isEmpty() || valorRegistro == null) {
                         valorRegistro = "0";
                     }
-                   
+
                     break;
             }
-            
+
             DefaultTableModel modelo = (DefaultTableModel) tablaLineasCache.getModel();
-            
+
             String datoEscribir = txtEscribirRAM.getText();
-            if(!datoEscribir.isEmpty()){
+            if (!datoEscribir.isEmpty()) {
                 String direccion = Direccionamiento.generarDireccionFisica(peti);
                 int bloque = Cache.generarBloqueMP(direccion);
                 int palabra = Cache.generarPalabra(direccion);
                 int linea = bloque % numLineas;
                 String eti = Cache.generarEtiqueta(direccion, correspondencia.getSelectedIndex());
-                RAM.set(bloque + palabra, datoEscribir);
+                RAM.set(bloque * Cache.TAMANIO_BLOQUE + palabra, datoEscribir);
                 Linea l = CACHE.get(linea);
                 l.etiqueta = eti;
-                for(int i=0;i<8;i++){
-                    l.linea.set(i, RAM.get(bloque + i));
-                    modelo.setValueAt(RAM.get(bloque + i), linea, i+1);
+                for (int i = 0; i < Cache.TAMANIO_BLOQUE; i++) {
+                    l.linea.set(i, RAM.get(bloque * Cache.TAMANIO_BLOQUE + i));
+                    modelo.setValueAt(RAM.get(bloque * Cache.TAMANIO_BLOQUE + i), linea, i + 1);
                 }
                 JOptionPane.showMessageDialog(this, "Linea Cache Actualizada: " + linea);
-            }else{
+            } else {
                 JOptionPane.showMessageDialog(this, "El campo de datos no puede estar vacio");
             }
-            
+
             modelo.fireTableDataChanged();
 
         } else {
             JOptionPane.showMessageDialog(this, "El campo de direcciones no puede estar basio", "No Nulo", JOptionPane.WARNING_MESSAGE);
         }
-        
+
     }//GEN-LAST:event_escribirRamActionPerformed
 
     /**

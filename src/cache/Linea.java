@@ -12,6 +12,8 @@ public class Linea {
     
     public List<String> linea = new ArrayList<>();
     public String etiqueta;
+    public int usado = 0;
+    public int ordenLLegada = 0;
 
     public void inicializarElementos(){
         for(int i=0;i<Cache.TAMANIO_BLOQUE;i++){

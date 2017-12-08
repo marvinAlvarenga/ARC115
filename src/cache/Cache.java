@@ -9,6 +9,8 @@ public class Cache {
     public static final int CORRESPONDENCIA_ASOCIATIVA = 1;
     public static final int CORRESPONDENCIA_POR_CONJUNTO = 2;
     public static final int TAMANIO_BLOQUE = 8;
+    public static final int LRU = 0;
+    public static final int FIFO = 1;
     
     /**
      * Devuelve la etiqueta de una direccion fisica
@@ -28,6 +30,10 @@ public class Cache {
         switch(correspondencia){
             case CORRESPONDENCIA_DIRECTA:
                 etiquetaBin = binario.substring(0, binario.length() - 10);
+                etiqueta = Integer.toString(Integer.parseInt(etiquetaBin, 2), 16);
+            break;
+            case CORRESPONDENCIA_POR_CONJUNTO:
+                etiquetaBin = binario.substring(0, binario.length() - 9);
                 etiqueta = Integer.toString(Integer.parseInt(etiquetaBin, 2), 16);
             break;
         }
