@@ -426,7 +426,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
 
         jLabel17.setText("Método de direccionamiento:");
 
-        metDireccionamiento.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Directo", "Indirecto con Registro", "Desplazamiento Relativo", "Desplazamiento Registro Base", "Indexado", "Pila" }));
+        metDireccionamiento.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Directo", "Indirecto con Registro", "Desplazamiento Relativo", "Desplazamiento Registro Base", "Indexado" }));
         metDireccionamiento.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 metDireccionamientoItemStateChanged(evt);
@@ -546,7 +546,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
             }
         });
 
-        sustitucion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "LRU", "FIFO", "LFU" }));
+        sustitucion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "LRU", "FIFO" }));
         sustitucion.setEnabled(false);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -1230,15 +1230,15 @@ public class SimuladorFrame extends javax.swing.JFrame {
                         if (numElemEnCache < lineasUsarAsociativa) { //Hay espacio en cache: Meter dato en una linea vacia
                             pasos.addRow(new Object[]{"Actualizando Cache. Linea: " + numElemEnCache});
                             Linea l = CACHE.get(numElemEnCache);
-                            dato = l.linea.get(palabra);
                             l.etiqueta = etiqueta;
                             for (int i = 0; i < Cache.TAMANIO_BLOQUE; i++) {
                                 l.linea.set(i, RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i));
                                 cache.setValueAt(RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i), numElemEnCache, i + 1);
                             }
+                            dato = l.linea.get(palabra);
                             CAFIFO.add(numElemEnCache);
                             CALRU.add(numElemEnCache); //Usado mas recientemente
-                        }else if(metodoSustitucion == Cache.LRU){ //Si la Cache esta llena, Usar un algoritmo de Sustitucion
+                        } else if (metodoSustitucion == Cache.LRU) { //Si la Cache esta llena, Usar un algoritmo de Sustitucion
                             int lineaReemplazar = CALRU.get(0);
                             pasos.addRow(new Object[]{"Actualizando Cache. Linea: " + lineaReemplazar});
                             CALRU.remove(0);
@@ -1251,6 +1251,21 @@ public class SimuladorFrame extends javax.swing.JFrame {
                                 l.linea.set(i, RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i));
                                 cache.setValueAt(RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i), lineaReemplazar, i + 1);
                             }
+                            dato = l.linea.get(palabra);
+                        } else if (metodoSustitucion == Cache.FIFO) {
+                            int lineaReemplazar = CAFIFO.get(0);
+                            pasos.addRow(new Object[]{"Actualizando Cache. Linea: " + lineaReemplazar});
+                            CAFIFO.remove(0);
+                            CAFIFO.add(lineaReemplazar); //pasar al final de la cola
+                            CALRU.remove(lineaReemplazar);
+                            CALRU.add(lineaReemplazar); // Nuevo usado mas recientemente
+                            Linea l = CACHE.get(lineaReemplazar);
+                            l.etiqueta = etiqueta;
+                            for (int i = 0; i < Cache.TAMANIO_BLOQUE; i++) {
+                                l.linea.set(i, RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i));
+                                cache.setValueAt(RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i), lineaReemplazar, i + 1);
+                            }
+                            dato = l.linea.get(palabra);
                         }
                     }
                     resultados.addRow(new Object[]{dato});
@@ -1435,6 +1450,65 @@ public class SimuladorFrame extends javax.swing.JFrame {
                         }
                     }
 
+                } else if (corresp == Cache.CORRESPONDENCIA_ASOCIATIVA) {
+                    RAM.set(bloque * Cache.TAMANIO_BLOQUE + palabra, datoEscribir);
+                    int lineaEncontrado = -1;
+                    for (int i = 0; i < lineasUsarAsociativa; i++) { //Buscando si el dato ya esta en cache para actualizarlo
+                        Linea l = CACHE.get(i);
+                        if (l.etiqueta != null && l.etiqueta.equals(eti)) {
+                            lineaEncontrado = i;
+                            break;
+                        }
+                    }
+                    if (lineaEncontrado != -1) { //El dato si estaba ya en cache
+                        Linea l = CACHE.get(lineaEncontrado);
+                        for (int i = 0; i < Cache.TAMANIO_BLOQUE; i++) { //Actualizando Cache
+                            l.linea.set(i, RAM.get(bloque * Cache.TAMANIO_BLOQUE + i));
+                            modelo.setValueAt(RAM.get(bloque * Cache.TAMANIO_BLOQUE + i), lineaEncontrado, i + 1);
+                        }
+                        CALRU.remove(lineaEncontrado); //Establecer como el usado más recientemente
+                        CALRU.add(lineaEncontrado);
+                        JOptionPane.showMessageDialog(this, "La linea de cache: " + lineaEncontrado + ", fue actualizada");
+                    } else {
+                        int numElemEnCache = CAFIFO.size();
+                        if (numElemEnCache < lineasUsarAsociativa) { //Verificar que hayan posiciones libres para escribir
+                            Linea l = CACHE.get(numElemEnCache);
+                            l.etiqueta = eti;
+                            for (int i = 0; i < Cache.TAMANIO_BLOQUE; i++) {
+                                l.linea.set(i, RAM.get(bloque * Cache.TAMANIO_BLOQUE + i));
+                                modelo.setValueAt(RAM.get(bloque * Cache.TAMANIO_BLOQUE + i), numElemEnCache, i + 1);
+                            }
+                            CALRU.add(numElemEnCache);
+                            CAFIFO.add(numElemEnCache);
+                            JOptionPane.showMessageDialog(this, "La linea de cache: " + numElemEnCache + ", fue actualizada");
+                        }else if(reemplazo == Cache.LRU){ //Si la cache esta llena usar algoritmo de reemplazo
+                            int lineaReemplazo = CALRU.get(0);
+                            CALRU.remove(0);
+                            CALRU.add(lineaReemplazo); //Poner como usado más recientemente
+                            CAFIFO.remove(lineaReemplazo);
+                            CAFIFO.add(lineaReemplazo);
+                            Linea l = CACHE.get(lineaReemplazo);
+                            l.etiqueta = eti;
+                            for (int i = 0; i < Cache.TAMANIO_BLOQUE; i++) {
+                                l.linea.set(i, RAM.get(bloque * Cache.TAMANIO_BLOQUE + i));
+                                modelo.setValueAt(RAM.get(bloque * Cache.TAMANIO_BLOQUE + i), lineaReemplazo, i + 1);
+                            }
+                            JOptionPane.showMessageDialog(this, "La linea de cache: " + lineaReemplazo + ", fue actualizada");
+                        }else if(reemplazo == Cache.FIFO){
+                            int lineaReemplazo = CAFIFO.get(0);
+                            CAFIFO.remove(0);
+                            CAFIFO.add(lineaReemplazo);
+                            CALRU.remove(lineaReemplazo);
+                            CALRU.add(lineaReemplazo);
+                            Linea l = CACHE.get(lineaReemplazo);
+                            l.etiqueta = eti;
+                            for (int i = 0; i < Cache.TAMANIO_BLOQUE; i++) {
+                                l.linea.set(i, RAM.get(bloque * Cache.TAMANIO_BLOQUE + i));
+                                modelo.setValueAt(RAM.get(bloque * Cache.TAMANIO_BLOQUE + i), lineaReemplazo, i + 1);
+                            }
+                            JOptionPane.showMessageDialog(this, "La linea de cache: " + lineaReemplazo + ", fue actualizada");
+                        }
+                    }
                 }
 
             } else {
