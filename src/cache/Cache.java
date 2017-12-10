@@ -36,6 +36,9 @@ public class Cache {
                 etiquetaBin = binario.substring(0, binario.length() - 9);
                 etiqueta = Integer.toString(Integer.parseInt(etiquetaBin, 2), 16);
             break;
+            case CORRESPONDENCIA_ASOCIATIVA:
+                etiquetaBin = binario.substring(0, binario.length() - 3);
+                etiqueta = Integer.toString(Integer.parseInt(etiquetaBin, 2), 16);
         }
         return etiqueta;
     }

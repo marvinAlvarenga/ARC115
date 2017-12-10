@@ -34,6 +34,11 @@ public class SimuladorFrame extends javax.swing.JFrame {
     List<Linea> CACHE = new ArrayList<>();
     LinkedList<Peticion> colaPeticiones = new LinkedList<>();
 
+    //LISTA QUE DAN SOPORTE A REEMPLAZAMIENTO FIFO Y LRU DE LA TOTALMENTE ASOCIATIVA
+    List<Integer> CAFIFO = new ArrayList<>();
+    List<Integer> CALRU = new ArrayList<>();
+    private int lineasUsarAsociativa = 5;
+
     /**
      * Creates new form SimuladorFrame
      */
@@ -1196,6 +1201,55 @@ public class SimuladorFrame extends javax.swing.JFrame {
                                 lineaI.usado = 0;
                                 lineaII.ordenLLegada = 0;
                                 lineaI.ordenLLegada++;
+                            }
+                        }
+                    }
+                    resultados.addRow(new Object[]{dato});
+                } else if (tipoCorrespondencia == Cache.CORRESPONDENCIA_ASOCIATIVA) {
+                    int lineaExito = -1;
+                    for (int i = 0; i < lineasUsarAsociativa; i++) { //Verifiacndo si el dato ya esta en cache
+                        Linea li = CACHE.get(i);
+                        if (li.etiqueta != null && li.etiqueta.equals(etiqueta)) {
+                            lineaExito = i;
+                            break;
+                        }
+                    }
+                    if (lineaExito != -1) { //Exito en la cache
+                        aciertos++;
+                        this.aciertos.setText(String.valueOf(aciertos));
+                        pasos.addRow(new Object[]{"Acierto en Cache. Linea: " + lineaExito});
+                        pasos.addRow(new Object[]{"Devolviendo dato a CPU. Palabra: " + palabra});
+                        dato = CACHE.get(lineaExito).linea.get(palabra);
+                        CALRU.remove(lineaExito); //Eliminar de su posicion actual
+                        CALRU.add(lineaExito); //Pasar al mas usado recientemente
+                    } else { //NO HAY EXITO EN CACHE
+                        pasos.addRow(new Object[]{"Fallo en Cache"});
+                        //pasos.addRow(new Object[]{"Actualizando Cache. Linea: " + numLinea});
+                        pasos.addRow(new Object[]{"Devolviendo dato a CPU. Palabra: " + palabra});
+                        int numElemEnCache = CAFIFO.size(); //verificar si la cache esta llena
+                        if (numElemEnCache < lineasUsarAsociativa) { //Hay espacio en cache: Meter dato en una linea vacia
+                            pasos.addRow(new Object[]{"Actualizando Cache. Linea: " + numElemEnCache});
+                            Linea l = CACHE.get(numElemEnCache);
+                            dato = l.linea.get(palabra);
+                            l.etiqueta = etiqueta;
+                            for (int i = 0; i < Cache.TAMANIO_BLOQUE; i++) {
+                                l.linea.set(i, RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i));
+                                cache.setValueAt(RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i), numElemEnCache, i + 1);
+                            }
+                            CAFIFO.add(numElemEnCache);
+                            CALRU.add(numElemEnCache); //Usado mas recientemente
+                        }else if(metodoSustitucion == Cache.LRU){ //Si la Cache esta llena, Usar un algoritmo de Sustitucion
+                            int lineaReemplazar = CALRU.get(0);
+                            pasos.addRow(new Object[]{"Actualizando Cache. Linea: " + lineaReemplazar});
+                            CALRU.remove(0);
+                            CALRU.add(lineaReemplazar); //Usado mas recientemente
+                            CAFIFO.remove(lineaReemplazar); //Nuevo dato, pasar al ultimo de la cola
+                            CAFIFO.add(lineaReemplazar);
+                            Linea l = CACHE.get(lineaReemplazar);
+                            l.etiqueta = etiqueta;
+                            for (int i = 0; i < Cache.TAMANIO_BLOQUE; i++) {
+                                l.linea.set(i, RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i));
+                                cache.setValueAt(RAM.get(numBloque * Cache.TAMANIO_BLOQUE + i), lineaReemplazar, i + 1);
                             }
                         }
                     }
