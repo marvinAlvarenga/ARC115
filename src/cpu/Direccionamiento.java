@@ -20,6 +20,9 @@ public class Direccionamiento {
      * @return String - Una cadena con la direccion fisica del operando en base al metodo de direccionamiento
      */
     public static String generarDireccionFisica(Peticion p){
+        if(p.valorRegistro==null){
+            p.valorRegistro="0";
+        }
         String direccion = null;
         int desplaza4Bits = 0;
         int desplazamiento = 0;

@@ -749,7 +749,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
 
         jLabel24.setText("Método de direccionamiento:");
 
-        metDireccionamientoRAM.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Directo", "Indirecto con Registro", "Desplazamiento Relativo", "Desplazamiento Registro Base", "Indexado", "Pila" }));
+        metDireccionamientoRAM.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Directo", "Indirecto con Registro", "Desplazamiento Relativo", "Desplazamiento Registro Base", "Indexado" }));
         metDireccionamientoRAM.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 metDireccionamientoRAMActionPerformed(evt);
@@ -1106,7 +1106,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
                         pasos.addRow(new Object[]{"Fallo en Cache"});
                         pasos.addRow(new Object[]{"Actualizando Cache. Linea: " + numLinea});
                         pasos.addRow(new Object[]{"Devolviendo dato a CPU. Palabra: " + palabra});
-                        //dato = RAM.get(numBloque * Cache.TAMANIO_BLOQUE + palabra);
+                        dato = RAM.get(numBloque * Cache.TAMANIO_BLOQUE + palabra);
                         resultados.addRow(new Object[]{dato});
                         l.etiqueta = etiqueta;
                         for (int i = 0; i < Cache.TAMANIO_BLOQUE; i++) {

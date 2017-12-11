@@ -1077,13 +1077,12 @@
             <Component class="javax.swing.JComboBox" name="metDireccionamientoRAM">
               <Properties>
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                  <StringArray count="6">
+                  <StringArray count="5">
                     <StringItem index="0" value="Directo"/>
                     <StringItem index="1" value="Indirecto con Registro"/>
                     <StringItem index="2" value="Desplazamiento Relativo"/>
                     <StringItem index="3" value="Desplazamiento Registro Base"/>
                     <StringItem index="4" value="Indexado"/>
-                    <StringItem index="5" value="Pila"/>
                   </StringArray>
                 </Property>
               </Properties>
