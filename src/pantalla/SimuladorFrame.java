@@ -37,7 +37,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
     //LISTA QUE DAN SOPORTE A REEMPLAZAMIENTO FIFO Y LRU DE LA TOTALMENTE ASOCIATIVA
     List<Integer> CAFIFO = new ArrayList<>();
     List<Integer> CALRU = new ArrayList<>();
-    private int lineasUsarAsociativa = 5;
+    private int lineasUsarAsociativa = 3;
 
     /**
      * Creates new form SimuladorFrame
@@ -1028,7 +1028,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
             }
             colaPeticiones.offer(peti);
         } else {
-            JOptionPane.showMessageDialog(this, "El campo de direcciones no puede estar basio", "No Nulo", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "El campo de direcciones no puede estar vacio", "No Nulo", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_agregarPeticionActionPerformed
 
