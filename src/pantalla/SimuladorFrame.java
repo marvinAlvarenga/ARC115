@@ -131,6 +131,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
         tablaPasosRealizados = new javax.swing.JTable();
         jScrollPane4 = new javax.swing.JScrollPane();
         tablaResultados = new javax.swing.JTable();
+        txtRestablecer = new javax.swing.JButton();
         jPanelRAM = new javax.swing.JPanel();
         jPanelIngresarCPU1 = new javax.swing.JPanel();
         jLabel23 = new javax.swing.JLabel();
@@ -681,6 +682,13 @@ public class SimuladorFrame extends javax.swing.JFrame {
             tablaResultados.getColumnModel().getColumn(0).setResizable(false);
         }
 
+        txtRestablecer.setText("Restablecer");
+        txtRestablecer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtRestablecerActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -688,15 +696,19 @@ public class SimuladorFrame extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(29, 29, 29)
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 251, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel22)
                         .addGap(37, 37, 37)
-                        .addComponent(aciertos, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(aciertos, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(38, 38, 38)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(29, 29, 29)
-                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 251, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(38, 38, 38)
-                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(10, 10, 10)
+                        .addComponent(txtRestablecer))
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -706,11 +718,12 @@ public class SimuladorFrame extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel22)
-                    .addComponent(aciertos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(44, 44, 44))
+                    .addComponent(aciertos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtRestablecer))
+                .addGap(42, 42, 42))
         );
 
         javax.swing.GroupLayout jPanelCacheLayout = new javax.swing.GroupLayout(jPanelCache);
@@ -1523,6 +1536,26 @@ public class SimuladorFrame extends javax.swing.JFrame {
 
     }//GEN-LAST:event_escribirRamActionPerformed
 
+    private void txtRestablecerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRestablecerActionPerformed
+        CACHE = null;
+        CACHE = new ArrayList<>();
+        
+        DefaultTableModel modelo = (DefaultTableModel)tablaLineasCache.getModel();
+        for(int i=0;i<numLineas;i++){
+            modelo.removeRow(0);
+        }
+        
+        for (int j = 0; j < numLineas; j++) {
+            Linea l = new Linea();
+            l.inicializarElementos();
+            CACHE.add(l);
+
+            modelo.addRow(new Object[]{j, l.linea.get(0), l.linea.get(1), l.linea.get(2), l.linea.get(3), l.linea.get(4), l.linea.get(5), l.linea.get(6), l.linea.get(7)});
+        }
+        
+        modelo.fireTableDataChanged();
+    }//GEN-LAST:event_txtRestablecerActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1625,6 +1658,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
     private javax.swing.JTextField txtDX;
     private javax.swing.JTextField txtES;
     private javax.swing.JTextField txtEscribirRAM;
+    private javax.swing.JButton txtRestablecer;
     private javax.swing.JTextField txtSI;
     private javax.swing.JTextField txtSP;
     private javax.swing.JTextField txtSS;
