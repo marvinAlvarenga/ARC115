@@ -965,7 +965,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_metDireccionamientoActionPerformed
 
     private void metDireccionamientoRAMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_metDireccionamientoRAMActionPerformed
-        if (metDireccionamientoRAM.getSelectedIndex() == Direccionamiento.INDIRECTO_REGISTRO || metDireccionamientoRAM.getSelectedIndex() == Direccionamiento.DESPLAZA_REGISTRO_BASE || metDireccionamiento.getSelectedIndex() == Direccionamiento.INDEXADO) {
+        if (metDireccionamientoRAM.getSelectedIndex() == Direccionamiento.INDIRECTO_REGISTRO || metDireccionamientoRAM.getSelectedIndex() == Direccionamiento.DESPLAZA_REGISTRO_BASE || metDireccionamientoRAM.getSelectedIndex() == Direccionamiento.INDEXADO) {
             jLabel25.setEnabled(true);
             regUsarRAM.setEnabled(true);
         } else {
