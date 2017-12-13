@@ -1233,7 +1233,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
                         pasos.addRow(new Object[]{"Acierto en Cache. Linea: " + lineaExito});
                         pasos.addRow(new Object[]{"Devolviendo dato a CPU. Palabra: " + palabra});
                         dato = CACHE.get(lineaExito).linea.get(palabra);
-                        CALRU.remove(lineaExito); //Eliminar de su posicion actual
+                        CALRU.remove(new Integer(lineaExito)); //Eliminar de su posicion actual
                         CALRU.add(lineaExito); //Pasar al mas usado recientemente
                     } else { //NO HAY EXITO EN CACHE
                         pasos.addRow(new Object[]{"Fallo en Cache"});
@@ -1256,7 +1256,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
                             pasos.addRow(new Object[]{"Actualizando Cache. Linea: " + lineaReemplazar});
                             CALRU.remove(0);
                             CALRU.add(lineaReemplazar); //Usado mas recientemente
-                            CAFIFO.remove(lineaReemplazar); //Nuevo dato, pasar al ultimo de la cola
+                            CAFIFO.remove(new Integer(lineaReemplazar)); //Nuevo dato, pasar al ultimo de la cola
                             CAFIFO.add(lineaReemplazar);
                             Linea l = CACHE.get(lineaReemplazar);
                             l.etiqueta = etiqueta;
@@ -1270,7 +1270,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
                             pasos.addRow(new Object[]{"Actualizando Cache. Linea: " + lineaReemplazar});
                             CAFIFO.remove(0);
                             CAFIFO.add(lineaReemplazar); //pasar al final de la cola
-                            CALRU.remove(lineaReemplazar);
+                            CALRU.remove(new Integer(lineaReemplazar));
                             CALRU.add(lineaReemplazar); // Nuevo usado mas recientemente
                             Linea l = CACHE.get(lineaReemplazar);
                             l.etiqueta = etiqueta;
@@ -1479,7 +1479,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
                             l.linea.set(i, RAM.get(bloque * Cache.TAMANIO_BLOQUE + i));
                             modelo.setValueAt(RAM.get(bloque * Cache.TAMANIO_BLOQUE + i), lineaEncontrado, i + 1);
                         }
-                        CALRU.remove(lineaEncontrado); //Establecer como el usado más recientemente
+                        CALRU.remove(new Integer(lineaEncontrado)); //Establecer como el usado más recientemente
                         CALRU.add(lineaEncontrado);
                         JOptionPane.showMessageDialog(this, "La linea de cache: " + lineaEncontrado + ", fue actualizada");
                     } else {
@@ -1498,7 +1498,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
                             int lineaReemplazo = CALRU.get(0);
                             CALRU.remove(0);
                             CALRU.add(lineaReemplazo); //Poner como usado más recientemente
-                            CAFIFO.remove(lineaReemplazo);
+                            CAFIFO.remove(new Integer(lineaReemplazo));
                             CAFIFO.add(lineaReemplazo);
                             Linea l = CACHE.get(lineaReemplazo);
                             l.etiqueta = eti;
@@ -1511,7 +1511,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
                             int lineaReemplazo = CAFIFO.get(0);
                             CAFIFO.remove(0);
                             CAFIFO.add(lineaReemplazo);
-                            CALRU.remove(lineaReemplazo);
+                            CALRU.remove(new Integer(lineaReemplazo));
                             CALRU.add(lineaReemplazo);
                             Linea l = CACHE.get(lineaReemplazo);
                             l.etiqueta = eti;
