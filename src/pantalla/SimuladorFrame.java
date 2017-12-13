@@ -1359,7 +1359,7 @@ public class SimuladorFrame extends javax.swing.JFrame {
                     if (valorRegistro.isEmpty() || valorRegistro == null) {
                         valorRegistro = "0";
                     }
-
+                    peti.valorRegistro = valorRegistro;
                     break;
             }
 
@@ -1537,6 +1537,12 @@ public class SimuladorFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_escribirRamActionPerformed
 
     private void txtRestablecerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRestablecerActionPerformed
+        CAFIFO = null;
+        CAFIFO = new ArrayList<>();
+        
+        CALRU = null;
+        CALRU = new ArrayList<>();
+        
         CACHE = null;
         CACHE = new ArrayList<>();
         
